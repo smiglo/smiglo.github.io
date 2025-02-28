@@ -101,24 +101,28 @@ if (!inCLI) {
 if (!inCLI) {
   document.body.innerHTML += "<ul id='pwd-list'></ul>";
   const pwdList = document.getElementById("pwd-list");
-  for (i = 0; i < pwdCount; i++) {
-    let out = getPwd(segments, seglen);
-    console.log(out);
+
+  for (let i = 0; i < pwdCount; i++) {
+    const out = getPwd(segments, seglen);
     const listItem = document.createElement("li");
+    listItem.textContent = out;
+
+    listItem.style.transition = "background-color 150ms ease";
+
     listItem.addEventListener("click", () => {
       navigator.clipboard
         .writeText(listItem.textContent)
         .then(() => {
-          console.log("Copied to clipboard:", listItem.textContent);
           listItem.style.backgroundColor = "lightgreen";
           listItem.style.color = "black";
           setTimeout(() => {
+            listItem.style.transition = "background-color 350ms ease";
             listItem.style.backgroundColor = "";
             listItem.style.color = "";
-          }, 750);
+          }, 150);
         })
         .catch((err) => {
-          console.error("Failed to copy:", err);
+          console.error("Failed to copy:", listItem.textContent, err);
         });
     });
     pwdList.appendChild(listItem);
