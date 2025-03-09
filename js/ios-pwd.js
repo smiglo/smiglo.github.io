@@ -105,26 +105,31 @@ if (!inCLI) {
   for (let i = 0; i < pwdCount; i++) {
     const out = getPwd(segments, seglen);
     const listItem = document.createElement("li");
-    listItem.textContent = out;
+    const itemContent = document.createElement("span"); // Create a span for content
+    itemContent.textContent = out;
 
-    listItem.style.transition = "background-color 150ms ease";
+    itemContent.style.padding = "0.2rem";
+    itemContent.style.display = "inline-block";
+    itemContent.style.transition = "background-color 150ms ease";
 
-    listItem.addEventListener("click", () => {
+    itemContent.addEventListener("click", () => {
       navigator.clipboard
-        .writeText(listItem.textContent)
+        .writeText(itemContent.textContent)
         .then(() => {
-          listItem.style.backgroundColor = "lightgreen";
-          listItem.style.color = "black";
+          itemContent.style.backgroundColor = "lightgreen";
+          itemContent.style.color = "black";
           setTimeout(() => {
-            listItem.style.transition = "background-color 350ms ease";
-            listItem.style.backgroundColor = "";
-            listItem.style.color = "";
+            itemContent.style.transition = "background-color 350ms ease";
+            itemContent.style.backgroundColor = "";
+            itemContent.style.color = "";
           }, 150);
         })
         .catch((err) => {
-          console.error("Failed to copy:", listItem.textContent, err);
+          console.error("Failed to copy:", itemContent.textContent, err);
         });
     });
+
+    listItem.appendChild(itemContent); // Add span to the li
     pwdList.appendChild(listItem);
   }
 } else {
@@ -133,4 +138,3 @@ if (!inCLI) {
     console.log(out)
   }
 }
-
