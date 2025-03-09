@@ -60,9 +60,43 @@ function getPwd(segments, seglen) {
   return out;
 }
 
+function appendItem(pwdList, password, index) {
+  const listItem = document.createElement("li");
+  const info = document.createElement("spam");
+  info.textContent = index + ": ";
+  const itemContent = document.createElement("span");
+  itemContent.textContent = password;
+
+  itemContent.style.padding = "0.2rem";
+  itemContent.style.display = "inline-block";
+  itemContent.style.transition = "background-color 150ms ease";
+
+  itemContent.addEventListener("click", () => {
+    navigator.clipboard
+      .writeText(itemContent.textContent)
+      .then(() => {
+        itemContent.style.backgroundColor = "lightgreen";
+        itemContent.style.color = "black";
+        setTimeout(() => {
+          itemContent.style.transition = "background-color 350ms ease";
+          itemContent.style.backgroundColor = "";
+          itemContent.style.color = "";
+        }, 150);
+      })
+      .catch((err) => {
+        console.error("Failed to copy:", itemContent.textContent, err);
+      });
+  });
+
+  listItem.appendChild(info);
+  listItem.appendChild(itemContent);
+  pwdList.appendChild(listItem);
+}
+
 let segments = 3;
 let seglen = 6;
 let pwdCount = 5;
+let idx = undefined;
 let phrase = "default-seed";
 let base = Math.floor(Math.random() * 10000);
 
@@ -92,81 +126,56 @@ if (!inCLI) {
     (urlParams.has("base") && urlParams.get("base")) ||
     (urlParams.has("b") && urlParams.get("b")) ||
     base;
+  idx =
+    (urlParams.has("idx") && urlParams.get("idx")) ||
+    (urlParams.has("i") && urlParams.get("i")) ||
+    idx;
 } else {
   for (let i = 0; i < process.argv.length; i++) {
     switch (process.argv[i]) {
-      case "--":
-        break;
-      case "-s":
-        segments = process.argv[++i];
-        break;
-      case "-l":
-        seglen = process.argv[++i];
-        break;
-      case "-c":
-        pwdCount = process.argv[++i];
-        break;
+      case "-s": segments = process.argv[++i]; break;
+      case "-l": seglen = process.argv[++i]; break;
+      case "-c": pwdCount = process.argv[++i]; break;
       case "-p":
-      case "--phrase":
-        phrase = process.argv[++i];
-        break;
+      case "--phrase": phrase = process.argv[++i]; break;
       case "-b":
-      case "--base":
-        base = process.argv[++i];
-        break;
+      case "--base": base = process.argv[++i]; break;
+      case "-i":
+      case "--idx": idx = process.argv[++i]; break;
       default:
         break;
     }
   }
 }
 
+segments = parseInt(segments);
+seglen = parseInt(seglen);
+pwdCount = parseInt(pwdCount);
+base = parseInt(base);
+
+if (idx !== undefined) {
+  idx = parseInt(idx);
+  if (idx < 0) idx = undefined;
+  else if (idx >= pwdCount) pwdCount = idx + 1;
+}
+
 const prng = createSeededRandomFromString(phrase, base);
 
+const passwords = Array.from({ length: pwdCount }, () => getPwd(segments, seglen));
+
+if (idx !== undefined) {
+  passwords.splice(0, passwords.length, passwords[idx]);
+}
+
 if (!inCLI) {
-  document.body.innerHTML += "<p id='prng-info'></p>";
   const prngInfo = document.getElementById("prng-info");
   prngInfo.textContent = "?phrase=" + phrase + "&base=" + base;
-
-  document.body.innerHTML += "<ul id='pwd-list'></ul>";
+  if (idx !== undefined) prngInfo.textContent += "&idx=" + idx;
+  idx = idx || 0;
   const pwdList = document.getElementById("pwd-list");
-
-  for (let i = 0; i < pwdCount; i++) {
-    const out = getPwd(segments, seglen);
-    const listItem = document.createElement("li");
-    const info = document.createElement("spam");
-    info.textContent = i + ": ";
-    const itemContent = document.createElement("span");
-    itemContent.textContent = out;
-
-    itemContent.style.padding = "0.2rem";
-    itemContent.style.display = "inline-block";
-    itemContent.style.transition = "background-color 150ms ease";
-
-    itemContent.addEventListener("click", () => {
-      navigator.clipboard
-        .writeText(itemContent.textContent)
-        .then(() => {
-          itemContent.style.backgroundColor = "lightgreen";
-          itemContent.style.color = "black";
-          setTimeout(() => {
-            itemContent.style.transition = "background-color 350ms ease";
-            itemContent.style.backgroundColor = "";
-            itemContent.style.color = "";
-          }, 150);
-        })
-        .catch((err) => {
-          console.error("Failed to copy:", itemContent.textContent, err);
-        });
-    });
-
-    listItem.appendChild(info);
-    listItem.appendChild(itemContent);
-    pwdList.appendChild(listItem);
-  }
+  passwords.forEach((pwd, i) => appendItem(pwdList, pwd, idx+i));
 } else {
-  console.log(`${phrase} :: ${base}`)
-  for (let i = 0; i < pwdCount; i++) {
-    let out = getPwd(segments, seglen)
-    console.log(`${i}: ${out}`)
-  }
+  idx = idx || 0;
+  console.log(`${phrase} :: ${base}`);
+  passwords.forEach((pwd, i) => console.log(`${idx+i}: ${pwd}`))
 }
