@@ -16,3 +16,14 @@
   font-style: normal;
 }
 
+.pwd-item{
+  padding: 0.2rem;
+  display: inline-block;
+  transition: background-color 350ms ease;
+}
+
+.copied{
+  background-color: lightgreen;
+  color: black;
+  transition: background-color 150ms ease;
+}
