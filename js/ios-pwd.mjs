@@ -1,14 +1,14 @@
-import { createSeededRandomFromString } from "./prng.mjs";
+import { createPRNG } from "./prng.mjs";
 
-function getRangeRandom(len) {
+function getRangeRandom(prng, len) {
   return Math.floor(prng.next() * len);
 }
 
-function getItem(list) {
-  return list[getRangeRandom(list.length)];
+function getItem(prng, list) {
+  return list[getRangeRandom(prng, list.length)];
 }
 
-function getPwd(segments, seglen) {
+function getPwd(prng, segments, seglen) {
   const Digits = "0123456789";
   const Vovels = "aeiouy";
   const Consonants = "bcdfghjklmnpqrstvwz";
@@ -21,8 +21,8 @@ function getPwd(segments, seglen) {
   };
 
   let len = segments * seglen;
-  let idxDigit = getRangeRandom(len);
-  let idxUpper = (idxDigit + 1 + getRangeRandom(len - 1)) % len;
+  let idxDigit = getRangeRandom(prng, len);
+  let idxUpper = (idxDigit + 1 + getRangeRandom(prng, len - 1)) % len;
   let idx = 0;
   let out = "";
 
@@ -33,20 +33,20 @@ function getPwd(segments, seglen) {
       let c;
       switch (next) {
         case States.Letter:
-          c = getItem(Vovels + Consonants);
+          c = getItem(prng, Vovels + Consonants);
           if (Vovels.includes(c)) next = States.Conso;
           else next = States.Vovel;
           break;
         case States.Conso:
-          c = getItem(Consonants);
+          c = getItem(prng, Consonants);
           next = States.Letter;
           break;
         case States.Vovel:
-          c = getItem(Vovels);
+          c = getItem(prng, Vovels);
           next = States.Conso;
           break;
         case States.Digit:
-          c = getItem(Digits);
+          c = getItem(prng, Digits);
           next = States.Letter;
           break;
         default:
@@ -95,10 +95,10 @@ function appendItem(pwdList, password, index) {
 
 let segments = 3;
 let seglen = 6;
-let pwdCount = 5;
 let idx = undefined;
 let phrase = "default-seed";
-let base = Math.floor(Math.random() * 10000);
+let min = Math.floor(Math.random() * 1000) * 10;
+let max = undefined;
 
 let inCLI = false;
 if (typeof process !== "undefined" && process.release.name === "node")
@@ -114,34 +114,24 @@ if (!inCLI) {
     (urlParams.has("len") && urlParams.get("len")) ||
     (urlParams.has("l") && urlParams.get("l")) ||
     seglen;
-  pwdCount =
-    (urlParams.has("count") && urlParams.get("count")) ||
-    (urlParams.has("c") && urlParams.get("c")) ||
-    pwdCount;
   phrase =
     (urlParams.has("phrase") && urlParams.get("phrase")) ||
     (urlParams.has("p") && urlParams.get("p")) ||
     phrase;
-  base =
-    (urlParams.has("base") && urlParams.get("base")) ||
-    (urlParams.has("b") && urlParams.get("b")) ||
-    base;
-  idx =
-    (urlParams.has("idx") && urlParams.get("idx")) ||
-    (urlParams.has("i") && urlParams.get("i")) ||
-    idx;
+  min = (urlParams.has("min") && urlParams.get("min")) || min;
+  max = (urlParams.has("max") && urlParams.get("max")) || max;
+  idx = (urlParams.has("idx") && urlParams.get("idx")) || idx;
 } else {
   for (let i = 0; i < process.argv.length; i++) {
     switch (process.argv[i]) {
       case "-s": segments = process.argv[++i]; break;
       case "-l": seglen = process.argv[++i]; break;
-      case "-c": pwdCount = process.argv[++i]; break;
       case "-p":
       case "--phrase": phrase = process.argv[++i]; break;
-      case "-b":
-      case "--base": base = process.argv[++i]; break;
+      case "--min": min = process.argv[++i]; break;
+      case "--max": max = process.argv[++i]; break;
       case "-i":
-      case "--idx": idx = process.argv[++i]; break;
+      case "-idx": idx = process.argv[++i]; break;
       default:
         break;
     }
@@ -149,33 +139,44 @@ if (!inCLI) {
 }
 
 segments = parseInt(segments);
+segments = isNaN(segments) ? 3 : segments;
 seglen = parseInt(seglen);
-pwdCount = parseInt(pwdCount);
-base = parseInt(base);
-
+seglen = isNaN(seglen) ? 6 : seglen;
+min = parseInt(min);
+min = isNaN(min) ? 0 : min;
+max = parseInt(max);
+max = isNaN(max) ? 10 : max;
+if (min === undefined || min < 0) min = 0;
+if (max === undefined || max <= min) max = min + 10;
+idx = parseInt(idx);
+idx = isNaN(idx) ? undefined : idx;
 if (idx !== undefined) {
-  idx = parseInt(idx);
-  if (idx < 0) idx = undefined;
-  else if (idx >= pwdCount) pwdCount = idx + 1;
+  min = max = idx;
 }
 
-const prng = createSeededRandomFromString(phrase, base);
+const pwdCount = max - min + 1;
+const prng = createPRNG(phrase);
 
-const passwords = Array.from({ length: pwdCount }, () => getPwd(segments, seglen));
+for (let i = 0; i < min; i++) prng.next();
 
-if (idx !== undefined) {
-  passwords.splice(0, passwords.length, passwords[idx]);
-}
+const passwords = Array.from({ length: pwdCount }, () => getPwd(prng.newPrng(), segments, seglen));
 
 if (!inCLI) {
   const prngInfo = document.getElementById("prng-info");
-  prngInfo.textContent = "?phrase=" + phrase + "&base=" + base;
-  if (idx !== undefined) prngInfo.textContent += "&idx=" + idx;
-  idx = idx || 0;
+  prngInfo.textContent = "?phrase=" + phrase;
+  if (idx === undefined) {
+    prngInfo.textContent += "&min=" + min + "&max=" + max;
+  } else {
+    prngInfo.textContent += "&idx=" + idx;
+  }
+
   const pwdList = document.getElementById("pwd-list");
-  passwords.forEach((pwd, i) => appendItem(pwdList, pwd, idx+i));
+  passwords.forEach((pwd, i) => appendItem(pwdList, pwd, min+i));
 } else {
-  idx = idx || 0;
-  console.log(`${phrase} :: ${base}`);
-  passwords.forEach((pwd, i) => console.log(`${idx+i}: ${pwd}`))
+  if (idx === undefined) {
+    console.log(`${phrase}, [${min}, ${max}]`);
+  } else {
+    console.log(`${phrase}, i=${idx}`);
+  }
+  passwords.forEach((pwd, i) => console.log(`${min+i}: ${pwd}`))
 }

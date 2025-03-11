@@ -11,27 +11,28 @@ function stringToSeed(str) {
 }
 
 class SeededPRNG {
-  constructor(seed, base) {
-    this.seed = seed + base;
-    this.originalSeed = this.seed;
+  constructor(seed) {
+    this.seed = Math.abs(seed);
+    this.childSeed = Math.abs(( this.seed << 8 ) | (this.seed & 0x00FF00 >>8));
   }
-  
-  reset() {
-    this.seed = this.originalSeed;
+
+  newPrng() {
+    const m = Math.pow(2, 32);
+    this.next();
+    return new SeededPRNG((this.seed + this.childSeed) % m);
   }
- 
+
   next() {
     const a = 1664525;
     const c = 1013904223;
     const m = Math.pow(2, 32);
-    
+
     this.seed = (a * this.seed + c) % m;
-    
+
     return this.seed / m;
   }
 }
 
-export function createSeededRandomFromString(str, base) {
-  const seed = stringToSeed(str);
-  return new SeededPRNG(seed, base);
+export function createPRNG(str) {
+  return new SeededPRNG(stringToSeed(str));
 }
