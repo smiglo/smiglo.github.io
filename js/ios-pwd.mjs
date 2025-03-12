@@ -106,6 +106,67 @@ let phrase = "default-seed";
 let min = Math.floor(Math.random() * 1000) * 10 + 1;
 let count = 10;
 
+const PRNG_MAIN = createPRNG(phrase);
+    
+function generatePasswords() {
+  const phraseInput = document.getElementById("phraseInput");
+  const minInput = document.getElementById("minInput");
+  const countInput = document.getElementById("countInput");
+  const idxInput = document.getElementById("idxInput");
+  const segmentsInput = document.getElementById("segmentsInput");
+  const seglenInput = document.getElementById("seglenInput");
+
+  if (phraseInput.value == phrase
+    && minInput.value == min
+    && countInput.value == count
+    && ( (idx === undefined && idxInput.value == "" ) || ( idx !== undefined && idxInput.value == idx ) )
+    && segmentsInput.value == segments
+    && seglenInput.value == seglen) {
+      console.log("no change");
+    min = Math.floor(Math.random() * 1000) * 10 + 1;
+  } else {
+    console.log("changed");
+    phrase = phraseInput.value;
+    min = checkValue(minInput.value, 1);
+    count = checkValue(countInput.value, 10);
+    idx = checkValue(idxInput.value, undefined);
+    segments = checkValue(segmentsInput.value, 3);
+    seglen = checkValue(seglenInput.value, 6);
+  }
+  if (idx !== undefined) {
+    idxInput.value = idx;
+    min = idx;
+    count = 1;
+  } else {
+    idxInput.value = "";
+    if (min < 1) {
+      min = 1;
+    }
+    if (count <= 0) {
+      count = 10;
+    }
+  }
+  phraseInput.value = phrase;
+  minInput.value = min;
+  countInput.value = count;
+  segmentsInput.value = segments;
+  seglenInput.value = seglen;
+
+  console.log(`init: ${segments}x${seglen}, ${min}, +${count}`);
+  console.log(`seed: ${phrase}, 0x${PRNG_MAIN.seed.toString(16)}/0x${PRNG_MAIN.childSeed.toString(16)}`);
+
+  for (let i = 0; i < min; i++) PRNG_MAIN.next();
+
+  const passwords = Array.from({ length: count }, () => getPwd(PRNG_MAIN.newPrng(), segments, seglen));
+
+  const prngInfo = document.getElementById("prng-info");
+  prngInfo.textContent = "?phrase=" + phrase + "&min=" + min + "&count=" + count;
+
+  const pwdList = document.getElementById("pwd-list");
+  pwdList.innerHTML = "";
+  passwords.forEach((pwd, i) => appendItem(pwdList, pwd, min + i));
+}
+
 const IN_CLI = typeof process !== 'undefined' && process.versions?.node;
 
 if (!IN_CLI) {
@@ -125,6 +186,23 @@ if (!IN_CLI) {
   min = (urlParams.has("min") && urlParams.get("min")) || min;
   count = (urlParams.has("count") && urlParams.get("count")) || count;
   idx = (urlParams.has("idx") && urlParams.get("idx")) || idx;
+  segments = checkValue(segments, 3);
+  seglen = checkValue(seglen, 6);
+  min = checkValue(min, 1);
+  count = checkValue(count, 10);
+  if (min < 1) min = 1;
+  if (count <= 0) count = 10;
+  
+  if(idx!==undefined) {
+    min=idx;
+    count=1;
+  }
+
+  window.addEventListener("load", () => {
+    document.getElementById("generateButton").addEventListener("click", generatePasswords);
+    generatePasswords();
+  });
+
 } else {
   for (let i = 0; i < process.argv.length; i++) {
     switch (process.argv[i]) {
@@ -142,24 +220,24 @@ if (!IN_CLI) {
         break;
     }
   }
+
+  segments = checkValue(segments, 3);
+  seglen = checkValue(seglen, 6);
+  min = checkValue(min, 1);
+  count = checkValue(count, 10);
+  if (min < 1) min = 1;
+  if (count <= 0) count = 10;
+  idx = checkValue(idx, undefined);
+  if (idx !== undefined) {
+    min = idx;
+    count = 1;
+  }
+
+  console.log(`init: ${segments}x${seglen}, ${min}/${idx}, +${count}`);
+  console.log(`seed: ${phrase}, 0x${PRNG_MAIN.seed.toString(16)}/0x${PRNG_MAIN.childSeed.toString(16)}`);
+
+  passwords.forEach((pwd, i) => console.log(`${min+i}: ${pwd}`))
 }
-
-segments = checkValue(segments, 3);
-seglen = checkValue(seglen, 6);
-min = checkValue(min, 1);
-count = checkValue(count, 10);
-if (min < 1) min = 1;
-if (count <= 0) count = 10;
-idx = checkValue(idx, undefined);
-if (idx !== undefined) {
-  min = idx;
-  count = 1;
-}
-
-const PRNG_MAIN = createPRNG(phrase);
-
-console.log(`init: ${segments}x${seglen}, ${min}/${idx}, +${count}`);
-console.log(`seed: ${phrase}, 0x${PRNG_MAIN.seed.toString(16)}/0x${PRNG_MAIN.childSeed.toString(16)}`);
 
 for (let i = 0; i < min; i++) PRNG_MAIN.next();
 
