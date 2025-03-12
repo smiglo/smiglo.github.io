@@ -14,6 +14,18 @@ function checkValue(value, defValue) {
   return v;
 }
 
+function validate(minV, countV, idxV, segmentsV, seglenV) {
+  min = checkValue(minV, 1);
+  count = checkValue(countV, 10);
+  idx = checkValue(idxV, undefined);
+  segments = checkValue(segmentsV, 3);
+  seglen = checkValue(seglenV, 6);
+  if (idx !== undefined) {
+    min = idx;
+    count = 1;
+  }
+}
+
 function getPwd(prng, segments, seglen) {
   const DIGITS = "0123456789";
   const VOVELS = "aeiouy";
@@ -66,6 +78,25 @@ function getPwd(prng, segments, seglen) {
   return out.join("");
 }
 
+let segments = 3;
+let seglen = 6;
+let idx = undefined;
+let phrase = "default-seed";
+let count = 10;
+let min = Math.floor(Math.random() * 10000/count) * count + 1;
+
+function genPasswords() {
+  const PRNG_MAIN = createPRNG(phrase);
+
+  console.log(`init: ${segments}x${seglen}, ${min}, +${count}`);
+  console.log(`seed: ${phrase}, 0x${PRNG_MAIN.seed.toString(16)}/0x${PRNG_MAIN.childSeed.toString(16)}`);
+
+  for (let i = 0; i < min; i++) PRNG_MAIN.next();
+
+  const passwords = Array.from({ length: count }, () => getPwd(PRNG_MAIN.newPrng(), segments, seglen));
+  return passwords;
+}
+
 function createPasswordItem(password, index) {
     const listItem = document.createElement("li");
     const info = document.createElement("span");
@@ -99,12 +130,46 @@ function appendItem(pwdList, password, index) {
   pwdList.appendChild(listItem);
 }
 
-let segments = 3;
-let seglen = 6;
-let idx = undefined;
-let phrase = "default-seed";
-let min = Math.floor(Math.random() * 1000) * 10 + 1;
-let count = 10;
+function setFields() {
+  document.getElementById("phraseInput").value = phrase;
+  document.getElementById("minInput").value = min;
+  document.getElementById("countInput").value = count;
+  document.getElementById("segmentsInput").value = segments;
+  document.getElementById("seglenInput").value = seglen;
+  document.getElementById("idxInput").value = (idx !== undefined) ? idx : "";
+}
+
+function fillPasswords() {
+  document.getElementById("prng-info").textContent = "?phrase=" + phrase + "&min=" + min + "&count=" + count;
+
+  const pwdList = document.getElementById("pwd-list");
+  pwdList.innerHTML = "";
+  genPasswords().forEach((pwd, i) => appendItem(pwdList, pwd, min + i));
+}
+
+function regeneratePasswords() {
+  const phraseInput = document.getElementById("phraseInput");
+  const minInput = document.getElementById("minInput");
+  const countInput = document.getElementById("countInput");
+  const idxInput = document.getElementById("idxInput");
+  const segmentsInput = document.getElementById("segmentsInput");
+  const seglenInput = document.getElementById("seglenInput");
+
+  if (phraseInput.value == phrase
+    && minInput.value == min
+    && countInput.value == count
+    && ((idx === undefined && idxInput.value == "") || (idx !== undefined && idxInput.value == idx))
+    && segmentsInput.value == segments
+    && seglenInput.value == seglen) {
+    min += count;
+  } else {
+    phrase = phraseInput.value;
+    validate(minInput.value, countInput.value, idxInput.value, segmentsInput.value, seglenInput.value);
+  }
+
+  setFields();
+  fillPasswords();
+}
 
 const IN_CLI = typeof process !== 'undefined' && process.versions?.node;
 
@@ -125,6 +190,15 @@ if (!IN_CLI) {
   min = (urlParams.has("min") && urlParams.get("min")) || min;
   count = (urlParams.has("count") && urlParams.get("count")) || count;
   idx = (urlParams.has("idx") && urlParams.get("idx")) || idx;
+
+  validate(min, count, idx, segments, seglen);
+  
+  window.addEventListener("load", () => {
+    document.getElementById("generateButton").addEventListener("click", regeneratePasswords);
+    setFields();
+    fillPasswords();
+  });
+
 } else {
   for (let i = 0; i < process.argv.length; i++) {
     switch (process.argv[i]) {
@@ -142,40 +216,8 @@ if (!IN_CLI) {
         break;
     }
   }
-}
 
-segments = checkValue(segments, 3);
-seglen = checkValue(seglen, 6);
-min = checkValue(min, 1);
-count = checkValue(count, 10);
-if (min < 1) min = 1;
-if (count <= 0) count = 10;
-idx = checkValue(idx, undefined);
-if (idx !== undefined) {
-  min = idx;
-  count = 1;
-}
+  validate(min, count, idx, segments, seglen);
 
-const PRNG_MAIN = createPRNG(phrase);
-
-console.log(`init: ${segments}x${seglen}, ${min}/${idx}, +${count}`);
-console.log(`seed: ${phrase}, 0x${PRNG_MAIN.seed.toString(16)}/0x${PRNG_MAIN.childSeed.toString(16)}`);
-
-for (let i = 0; i < min; i++) PRNG_MAIN.next();
-
-const passwords = Array.from({ length: count }, () => getPwd(PRNG_MAIN.newPrng(), segments, seglen));
-
-if (!IN_CLI) {
-  const prngInfo = document.getElementById("prng-info");
-  prngInfo.textContent = "?phrase=" + phrase;
-  if (idx === undefined) {
-    prngInfo.textContent += "&min=" + min + "&count=" + count;
-  } else {
-    prngInfo.textContent += "&idx=" + idx;
-  }
-
-  const pwdList = document.getElementById("pwd-list");
-  passwords.forEach((pwd, i) => appendItem(pwdList, pwd, min+i));
-} else {
-  passwords.forEach((pwd, i) => console.log(`${min+i}: ${pwd}`))
+  genPasswords().forEach((pwd, i) => console.log(`${min+i}: ${pwd}`))
 }

@@ -13,16 +13,47 @@
 
   <link rel="icon" type="image/png" href="images/favi-pwd.png">
   <link rel="stylesheet" href="css/style.css">
+
 </head>
 
 <body class="fira-mono-regular">
 
 <body>
   <h1>Password Generator</h1>
-  <p id='prng-info'></p>
-  <ul id='pwd-list'></ul>
+
+  <ul id="pwd-list">
+  </ul>
+
+  <p>Link: <span id="prng-info"></span></p>
+
+  <button id="generateButton">Generate</button>
+  <div>
+    <label for="phraseInput">phrase:</label>
+    <input type="text" id="phraseInput" value="">
+  </div>
+  <div>
+    <label for="minInput">start:</label>
+    <input type="number" id="minInput" value="0">
+  </div>
+  <div>
+    <label for="countInput">count:</label>
+    <input type="number" id="countInput" value="0">
+  </div>
+  <div>
+    <label for="idxInput">idx:</label>
+    <input type="number" id="idxInput" value="">
+  </div>
+  <div>
+    <label for="segmentsInput">segments:</label>
+    <input type="number" id="segmentsInput" value="0">
+  </div>
+  <div>
+    <label for="seglenInput">segment-len:</label>
+    <input type="number" id="seglenInput" value="0">
+  </div>
 
   <script type="module" src="js/ios-pwd.mjs"></script>
+
 </body>
 
 </html>
