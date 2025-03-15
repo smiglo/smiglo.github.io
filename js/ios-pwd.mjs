@@ -8,24 +8,6 @@ function getItem(prng, list) {
   return list[getRangeRandom(prng, list.length)];
 }
 
-function checkValue(value, defValue) {
-  let v = parseInt(value);
-  v = isNaN(v) ? defValue : v;
-  return v;
-}
-
-function validate(minV, countV, idxV, segmentsV, seglenV) {
-  min = checkValue(minV, 1);
-  count = checkValue(countV, 10);
-  idx = checkValue(idxV, undefined);
-  segments = checkValue(segmentsV, 3);
-  seglen = checkValue(seglenV, 6);
-  if (idx !== undefined) {
-    min = idx;
-    count = 1;
-  }
-}
-
 function getPwd(prng, segments, seglen) {
   const DIGITS = "0123456789";
   const VOVELS = "aeiouy";
@@ -78,9 +60,21 @@ function getPwd(prng, segments, seglen) {
   return out.join("");
 }
 
+function checkValue(value, defValue) {
+  let v = parseInt(value);
+  v = isNaN(v) ? defValue : v;
+  return v;
+}
+
+function validate(minV, countV, segmentsV, seglenV) {
+  min = checkValue(minV, 1);
+  count = checkValue(countV, 10);
+  segments = checkValue(segmentsV, 3);
+  seglen = checkValue(seglenV, 6);
+}
+
 let segments = 3;
 let seglen = 6;
-let idx = undefined;
 let phrase = "default-seed";
 let count = 10;
 let min = Math.floor(Math.random() * 10000/count) * count + 1;
@@ -136,7 +130,6 @@ function setFields() {
   document.getElementById("countInput").value = count;
   document.getElementById("segmentsInput").value = segments;
   document.getElementById("seglenInput").value = seglen;
-  document.getElementById("idxInput").value = (idx !== undefined) ? idx : "";
 }
 
 function fillPasswords() {
@@ -151,20 +144,18 @@ function regeneratePasswords() {
   const phraseInput = document.getElementById("phraseInput");
   const minInput = document.getElementById("minInput");
   const countInput = document.getElementById("countInput");
-  const idxInput = document.getElementById("idxInput");
   const segmentsInput = document.getElementById("segmentsInput");
   const seglenInput = document.getElementById("seglenInput");
 
   if (phraseInput.value == phrase
     && minInput.value == min
     && countInput.value == count
-    && ((idx === undefined && idxInput.value == "") || (idx !== undefined && idxInput.value == idx))
     && segmentsInput.value == segments
     && seglenInput.value == seglen) {
     min += count;
   } else {
     phrase = phraseInput.value;
-    validate(minInput.value, countInput.value, idxInput.value, segmentsInput.value, seglenInput.value);
+    validate(minInput.value, countInput.value, segmentsInput.value, seglenInput.value);
   }
 
   setFields();
@@ -189,9 +180,8 @@ if (!IN_CLI) {
     phrase;
   min = (urlParams.has("min") && urlParams.get("min")) || min;
   count = (urlParams.has("count") && urlParams.get("count")) || count;
-  idx = (urlParams.has("idx") && urlParams.get("idx")) || idx;
 
-  validate(min, count, idx, segments, seglen);
+  validate(min, count, segments, seglen);
   
   window.addEventListener("load", () => {
     document.getElementById("generateButton").addEventListener("click", regeneratePasswords);
@@ -210,14 +200,12 @@ if (!IN_CLI) {
       case "--min": min = process.argv[++i]; break;
       case "-c":
       case "--count": count = process.argv[++i]; break;
-      case "-i":
-      case "-idx": idx = process.argv[++i]; break;
       default:
         break;
     }
   }
 
-  validate(min, count, idx, segments, seglen);
+  validate(min, count, segments, seglen);
 
   genPasswords().forEach((pwd, i) => console.log(`${min+i}: ${pwd}`))
 }
