@@ -17,3 +17,11 @@ body.dark-mode button {
 body.dark-mode label {
   color: #f8f8f2;
 }
+
+body.dark-mode a {
+  color: #66d9ef;
+}
+
+body.dark-mode a:hover {
+  color: #a6e22e;
+}
