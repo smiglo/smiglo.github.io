@@ -95,22 +95,19 @@ function genPasswords() {
   return passwords;
 }
 
-function createPasswordItem(password, index) {
+function createPasswordItem(password) {
     const listItem = document.createElement("li");
-    const info = document.createElement("span");
-    info.textContent = index + ": ";
 
     const itemContent = document.createElement("span");
     itemContent.textContent = password;
     itemContent.classList.add('pwd-item');
 
-    listItem.appendChild(info);
     listItem.appendChild(itemContent);
     return listItem;
 }
 
-function appendItem(pwdList, password, index) {
-  const listItem = createPasswordItem(password, index);
+function appendItem(pwdList, password) {
+  const listItem = createPasswordItem(password);
   const itemContent = listItem.querySelector('span.pwd-item');
   itemContent.addEventListener("click", () => {
     navigator.clipboard
@@ -141,7 +138,8 @@ function fillPasswords() {
 
   const pwdList = document.getElementById("pwd-list");
   pwdList.innerHTML = "";
-  genPasswords().forEach((pwd, i) => appendItem(pwdList, pwd, min + i));
+  pwdList.setAttribute("start", min);
+  genPasswords().forEach((pwd, i) => appendItem(pwdList, pwd));
 }
 
 function regeneratePasswords() {
