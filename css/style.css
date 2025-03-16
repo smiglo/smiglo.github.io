@@ -37,7 +37,7 @@
 .theme-switch-wrapper {
   display: flex;
   align-items: center;
-  margin-bottom: 0; /* Remove bottom margin */
+  margin-bottom: 0;
 }
 
 .theme-switch {
@@ -89,3 +89,58 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
+input {
+  font-family: "Fira Mono", monospace;
+  font-weight: 400;
+  font-size: 14px;
+  font-style: normal;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-container div {
+  display: flex;
+  align-items: center;
+}
+
+.input-container label {
+  width: 125px;
+  margin-right: 10px;
+}
+
+.input-container input {
+  width: 150;
+}
+
+.circle-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background-color: #2196F3;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.4s;
+}
+
+.circle-button:hover {
+  background-color: #1976D2;
+}
+
+.arrow-icon {
+  width: 24px;
+  height: 24px;
+  color: white;
+}
+
+.link-button-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

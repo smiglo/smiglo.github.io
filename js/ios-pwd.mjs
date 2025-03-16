@@ -230,6 +230,13 @@ if (!IN_CLI) {
   
   window.addEventListener("load", () => {
     document.getElementById("generateButton").addEventListener("click", regeneratePasswords);
+    document.querySelectorAll(".input-container input").forEach(input => {
+      input.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+          regeneratePasswords();
+        }
+      });
+    });
     document.getElementById('themeCheckbox').addEventListener('change', () => {
       document.body.classList.toggle('dark-mode');
       document.body.classList.toggle('light-mode');
