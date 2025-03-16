@@ -26,12 +26,6 @@
   <ol id="pwd-list">
   </ol>
 
-  <div class="link-button-container">
-    <button id="generateButton" class="circle-button">
-    </button>
-    <p><a href id="prng-info">link</a></p>
-  </div>
-
   <div class="input-container">
     <div>
       <label for="phraseInput">phrase:</label>
@@ -55,12 +49,18 @@
     </div>
   </div>
 
+  <div class="link-button-container">
+    <button id="generateButton" class="circle-button">
+    </button>
+    <p><a href id="prng-info">link</a></p>
+  </div>
+
   <div class="theme-switch-wrapper">
     <label class="theme-switch" for="themeCheckbox">
       <input type="checkbox" id="themeCheckbox" checked>
       <div class="slider round"></div>
     </label>
-    <em>Dark</em>
+    <em class="theme-label">Dark</em>
   </div>
 
   <script type="module" src="js/ios-pwd.mjs"></script>

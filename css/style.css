@@ -140,3 +140,7 @@ input {
   align-items: center;
   gap: 10px;
 }
+
+.theme-label {
+  margin-left: 5px;
+}
