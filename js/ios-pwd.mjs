@@ -134,7 +134,9 @@ function setFields() {
 }
 
 function fillPasswords() {
-  document.getElementById("prng-info").textContent = "?phrase=" + phrase + "&min=" + min + "&count=" + count;
+  const qIdx =  window.location.href.indexOf("?");
+  const href = qIdx > 0 ? window.location.href.substring(0, qIdx) : window.location.href;
+  document.getElementById("prng-info").href = href + "?phrase=" + phrase + "&min=" + min + "&count=" + count;
 
   const pwdList = document.getElementById("pwd-list");
   pwdList.innerHTML = "";
