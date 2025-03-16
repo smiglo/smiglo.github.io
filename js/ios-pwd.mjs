@@ -1,5 +1,15 @@
 import { createPRNG } from "./prng.mjs";
 
+function genStartupPhrase(len, sl) {
+  const characters = "abcdefghijklmnopqrstuvwxyz";
+  let out = [];
+  for (let i = 0; i < len; i++) {
+    if (i > 0 && i % sl === 0) out.push("-");
+    out.push(characters.charAt(Math.floor(Math.random() * characters.length)));
+  }
+  return out.join("");
+}
+
 function getRangeRandom(prng, len) {
   return Math.floor(prng.next() * len);
 }
@@ -68,16 +78,10 @@ function checkValue(value, defValue) {
 
 function validate(minV, countV, segmentsV, seglenV) {
   min = checkValue(minV, 1);
-  count = checkValue(countV, 10);
-  segments = checkValue(segmentsV, 3);
-  seglen = checkValue(seglenV, 6);
+  count = checkValue(countV, DEFAULTS.count);
+  segments = checkValue(segmentsV, DEFAULTS.segments);
+  seglen = checkValue(seglenV, DEFAULTS.seglen);
 }
-
-let segments = 3;
-let seglen = 6;
-let phrase = "default-seed";
-let count = 10;
-let min = Math.floor(Math.random() * 10000/count) * count + 1;
 
 function genPasswords() {
   const PRNG_MAIN = createPRNG(phrase);
@@ -162,25 +166,68 @@ function regeneratePasswords() {
   fillPasswords();
 }
 
+const DEFAULTS = {
+  segments: 3,
+  seglen: 6,
+  count: 10,
+  phrase: {
+    phrase: "default-phrase",
+    rand: {
+      cli: false,
+      web: true,
+      len: 16,
+      delim: 4,
+    }
+  }
+};
+
 const IN_CLI = typeof process !== 'undefined' && process.versions?.node;
+
+const USE_RAND_PHRASE = IN_CLI ? DEFAULTS.phrase.rand.cli : DEFAULTS.phrase.rand.web;
+
+let segments = DEFAULTS.segments;
+let seglen = DEFAULTS.seglen;
+let count = DEFAULTS.count 
+let phrase;
+let min;
+if (USE_RAND_PHRASE) {
+  phrase = genStartupPhrase(DEFAULTS.phrase.rand.len, DEFAULTS.phrase.rand.delim);
+  min = 1;
+} else {
+  phrase = DEFAULTS.phrase.phrase;
+  min = IN_CLI ? 1 : Math.floor(Math.random() * 10000/count) * count + 1;
+}
 
 if (!IN_CLI) {
   const urlParams = new URLSearchParams(window.location.search);
-  segments =
-    (urlParams.has("segments") && urlParams.get("segments")) ||
-    (urlParams.has("s") && urlParams.get("s")) ||
-    segments;
-  seglen =
-    (urlParams.has("len") && urlParams.get("len")) ||
-    (urlParams.has("l") && urlParams.get("l")) ||
-    seglen;
-  phrase =
-    (urlParams.has("phrase") && urlParams.get("phrase")) ||
-    (urlParams.has("p") && urlParams.get("p")) ||
-    phrase;
-  min = (urlParams.has("min") && urlParams.get("min")) || min;
-  count = (urlParams.has("count") && urlParams.get("count")) || count;
+  let anyParam =
+    urlParams.has("segments") || urlParams.has("s") ||
+    urlParams.has("len") || urlParams.has("l") ||
+    urlParams.has("phrase") || urlParams.has("p") ||
+    urlParams.has("min") ||
+    urlParams.has("count");
 
+  if (anyParam) {
+    phrase = undefined;
+    segments =
+      (urlParams.has("segments") && urlParams.get("segments")) ||
+      (urlParams.has("s") && urlParams.get("s")) ||
+      segments;
+    seglen =
+      (urlParams.has("len") && urlParams.get("len")) ||
+      (urlParams.has("l") && urlParams.get("l")) ||
+      seglen;
+    phrase =
+      (urlParams.has("phrase") && urlParams.get("phrase")) ||
+      (urlParams.has("p") && urlParams.get("p")) ||
+      phrase;
+    min = (urlParams.has("min") && urlParams.get("min")) || min;
+    count = (urlParams.has("count") && urlParams.get("count")) || count;
+    if (!phrase) {
+      phrase = DEFAULTS.phrase.phrase;
+      min = 1;
+    }
+  }
   validate(min, count, segments, seglen);
   
   window.addEventListener("load", () => {
@@ -188,7 +235,6 @@ if (!IN_CLI) {
     setFields();
     fillPasswords();
   });
-
 } else {
   for (let i = 0; i < process.argv.length; i++) {
     switch (process.argv[i]) {
@@ -204,8 +250,6 @@ if (!IN_CLI) {
         break;
     }
   }
-
   validate(min, count, segments, seglen);
-
   genPasswords().forEach((pwd, i) => console.log(`${min+i}: ${pwd}`))
 }
