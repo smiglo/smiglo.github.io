@@ -13,7 +13,8 @@ function stringToSeed(str) {
 class SeededPRNG {
   constructor(seed) {
     this.seed = Math.abs(seed);
-    this.childSeed = Math.abs(( this.seed << 8 ) | (this.seed & 0x00FF00 >>8));
+    this.childSeed = ~(( this.seed << 6 ) | (this.seed & 0x0FFFF0 >> 10));
+    this.childSeed = this.childSeed & 0x7FFFFFFF;
   }
 
   newPrng() {
