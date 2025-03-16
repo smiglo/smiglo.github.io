@@ -144,3 +144,13 @@ input {
 .theme-label {
   margin-left: 5px;
 }
+
+ol {
+  padding-left: 4rem;
+}
+
+ol li {
+  margin-left: 0;
+  padding-left: 0;
+  list-style-position: outside;
+}

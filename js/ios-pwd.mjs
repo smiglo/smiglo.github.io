@@ -141,7 +141,12 @@ function fillPasswords() {
   const pwdList = document.getElementById("pwd-list");
   pwdList.innerHTML = "";
   pwdList.setAttribute("start", min);
-  genPasswords().forEach((pwd, i) => appendItem(pwdList, pwd));
+  if (min + count < 1000) {
+    pwdList.setAttribute("padding-left", 4 + "rem");
+  } else {
+    pwdList.style.paddingLeft = ( Math.floor(Math.log10(min + count))  + 1 ) + "rem";
+  }
+  genPasswords().forEach(pwd => appendItem(pwdList, pwd));
 }
 
 function regeneratePasswords() {
