@@ -230,6 +230,10 @@ if (!IN_CLI) {
   
   window.addEventListener("load", () => {
     document.getElementById("generateButton").addEventListener("click", regeneratePasswords);
+    document.getElementById('themeCheckbox').addEventListener('change', () => {
+      document.body.classList.toggle('dark-mode');
+      document.body.classList.toggle('light-mode');
+    });
     setFields();
     fillPasswords();
   });

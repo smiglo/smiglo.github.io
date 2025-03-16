@@ -1,0 +1,19 @@
+body.light-mode {
+  background-color: #f8f8f2;
+  color: #272822;
+}
+
+body.light-mode h1 {
+  color: #272822;
+}
+
+body.light-mode input,
+body.light-mode button {
+  background-color: #ffffff;
+  color: #272822;
+  border: 1px solid #ccc;
+}
+
+body.light-mode label {
+  color: #272822;
+}

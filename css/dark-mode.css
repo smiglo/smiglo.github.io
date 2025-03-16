@@ -1,0 +1,19 @@
+body.dark-mode {
+  background-color: #272822;
+  color: #f8f8f2;
+}
+
+body.dark-mode h1 {
+  color: #f8f8f2;
+}
+
+body.dark-mode input,
+body.dark-mode button {
+  background-color: #3e3d32;
+  color: #f8f8f2;
+  border: 1px solid #555;
+}
+
+body.dark-mode label {
+  color: #f8f8f2;
+}
