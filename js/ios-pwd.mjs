@@ -228,7 +228,7 @@ if (!IN_CLI) {
   }
   validate(min, count, segments, seglen);
   
-  window.addEventListener("load", () => {
+  document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("generateButton").addEventListener("click", regeneratePasswords);
     document.querySelectorAll(".input-container input").forEach(input => {
       input.addEventListener("keypress", (event) => {
