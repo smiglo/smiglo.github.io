@@ -214,6 +214,7 @@ if (!IN_CLI) {
 
   if (anyParam) {
     phrase = undefined;
+    min = undefined;
     segments =
       (urlParams.has("segments") && urlParams.get("segments")) ||
       (urlParams.has("s") && urlParams.get("s")) ||
@@ -229,8 +230,10 @@ if (!IN_CLI) {
     min = (urlParams.has("min") && urlParams.get("min")) || min;
     count = (urlParams.has("count") && urlParams.get("count")) || count;
     if (!phrase) {
-      phrase = DEFAULTS.phrase.phrase;
-      min = 1;
+      phrase = USE_RAND_PHRASE ? genStartupPhrase(DEFAULTS.phrase.rand.len, DEFAULTS.phrase.rand.delim) : DEFAULTS.phrase.phrase;
+      min = min ?? 1;
+    } else {
+      min = min ?? Math.floor(Math.random() * 10000 / count) * count + 1;
     }
   }
   validate(min, count, segments, seglen);
