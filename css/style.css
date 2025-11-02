@@ -44,6 +44,7 @@
   align-items: center;
   margin-top: 10px;
   margin-bottom: 0;
+  gap: 10px;
 }
 
 .theme-switch {
@@ -155,13 +156,18 @@ input {
 }
 
 .theme-label {
-  margin-left: 5px;
+  font-style: normal;
 }
 
 .toggle-container {
   display: flex;
   align-items: center;
-  margin-bottom: 10px; /* Adds space between toggles */
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.toggle-container .theme-label {
+  width: 125px;
 }
 
 ol {
