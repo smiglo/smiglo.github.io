@@ -283,6 +283,10 @@ if (!IN_CLI) {
         hydrationPercentageInput.value = dough.hydrationPercent;
 
         rebuildSourdoughUI();
+        prefermentSection.style.display = preferment.enabled ? 'block' : 'none';
+        updatePrefermentHeaderVisibility();
+        rebuildOtherIngredientsUI();
+
         recalculateAllTotals();
       } catch (e) {
         console.error("Failed to parse or load recipe JSON:", e);
