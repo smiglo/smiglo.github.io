@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <title>Bake's Percentage Calculator</title>
+
+  <link rel="icon" type="image/png" href="images/favi-dough.png">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dark-mode.css">
+  <link rel="stylesheet" href="css/light-mode.css">
+  <link rel="stylesheet" href="css/dough.css">
+
+  <script type="module" src="js/dough.mjs"></script>
+
+</head>
+
+<body class="fira-mono-regular dark-mode">
+  <div class="header-container">
+    <h1>Dough Calculator</h1>
+  </div>
+
+  <div class="input-container name-container">
+    <div>
+      <label for="recipeNameInput">Name:</label>
+      <input type="text" id="recipeNameInput" class="full-width-input">
+    </div>
+  </div>
+
+  <div class="toggle-container">
+    <label class="theme-switch" for="sourdoughCheckbox">
+      <input type="checkbox" id="sourdoughCheckbox">
+      <div class="slider round"></div>
+    </label>
+    <em class="theme-label">Sourdough</em>
+  </div>
+
+  <div id="sourdough-section" style="display: none;">
+    <div class="input-container">
+      <div>
+        <label for="initialAmountInput">Initial:</label>
+        <input type="number" id="initialAmountInput" value="0" class="value-input">
+      </div>
+    </div>
+
+    <div class="input-container dough-header">
+      <div>
+        <label></label>
+        <span class="half-value-input-1">Flour</span>
+        <span class="half-value-input-2">Water</span>
+      </div>
+    </div>
+    <div id="sourdough-additions"></div>
+    <div class="input-container">
+      <div>
+        <label>Total</label>
+        <input type="number" id="sourdoughTotalWeight" class="value-input" readonly tabindex="-1">
+        <input type="text" id="sourdoughPercentage" class="percentage-input" readonly tabindex="-1">
+      </div>
+    </div>
+  </div>
+  
+  <div class="toggle-container">
+    <label class="theme-switch" for="prefermentCheckbox">
+      <input type="checkbox" id="prefermentCheckbox">
+      <div class="slider round"></div>
+    </label>
+    <em class="theme-label">Preferment</em>
+  </div>
+
+  <div id="preferment-section" style="display: none;">
+    <div class="input-container dough-header" id="preferment-header" style="display: none;">
+      <div>
+        <label></label>
+        <span class="half-value-input-1">Flour</span>
+        <span class="half-value-input-2">Water</span>
+      </div>
+    </div>
+    <div class="input-container">
+      <div>
+        <label></label>
+        <input type="number" id="prefermentFlourInput" class="half-value-input-1">
+        <input type="number" id="prefermentWaterInput" class="half-value-input-2">
+      </div>
+    </div>
+    <div class="input-container">
+      <div>
+        <label>Total</label>
+        <input type="number" id="prefermentTotalWeight" class="value-input" readonly tabindex="-1">
+        <input type="text" id="prefermentPercentage" class="percentage-input" readonly tabindex="-1">
+      </div>
+    </div>
+  </div>
+
+  <div class="toggle-container">
+    <span class="switch-placeholder"></span>
+    <em class="theme-label">Dough</em>
+  </div>
+
+  <div id="dough-section">
+    <div class="input-container dough-header">
+      <div>
+        <label></label>
+        <span>Weight</span>
+        <span>%</span>
+      </div>
+    </div>
+    <div class="input-container">
+      <div>
+        <label for="doughFlourInput">Add. flour:</label>
+        <input type="number" id="doughFlourInput" value="0" class="value-input">
+        <input type="text" id="doughFlourPercentage" class="percentage-input" readonly tabindex="-1">
+      </div>
+    </div>
+    <div class="input-container">
+      <div>
+        <label for="saltInput">Salt:</label>
+        <input type="number" id="saltInput" value="0" class="value-input" readonly tabindex="-1">
+        <input type="text" id="saltPercentage" class="percentage-input" readonly tabindex="-1">
+      </div>
+    </div>
+    <div class="input-container">
+      <div>
+        <label for="seedsInput">Seeds:</label>
+        <input type="number" id="seedsInput" value="0" class="value-input">
+        <input type="text" id="seedsPercentage" class="percentage-input" readonly tabindex="-1">
+      </div>
+    </div>
+    <div class="input-container">
+      <div>
+        <label for="glutenInput">Gluten:</label>
+        <input type="number" id="glutenInput" value="0" class="value-input">
+        <input type="text" id="glutenPercentage" class="percentage-input" readonly tabindex="-1">
+      </div>
+    </div>
+    <div class="input-container">
+      <div>
+        <label for="maltInput">Malt:</label>
+        <input type="number" id="maltInput" value="0" class="value-input">
+        <input type="text" id="maltPercentage" class="percentage-input" readonly tabindex="-1">
+      </div>
+    </div>
+    <div class="input-container">
+      <div>
+        <label for="molassesInput">Molasses:</label>
+        <input type="number" id="molassesInput" value="0" class="value-input">
+        <input type="text" id="molassesPercentage" class="percentage-input" readonly tabindex="-1">
+      </div>
+    </div>
+    <div class="input-container">
+      <div>
+        <label for="oilInput">Oil:</label>
+        <input type="number" id="oilInput" value="0" class="value-input">
+        <input type="text" id="oilPercentage" class="percentage-input" readonly tabindex="-1">
+      </div>
+    </div>
+  </div>
+
+  <div class="toggle-container">
+    <span class="switch-placeholder"></span>
+    <em class="theme-label">Hydration</em>
+  </div>
+
+  <div id="hydration-section">
+    <div class="input-container dough-header">
+      <div>
+        <label></label>
+        <span>Weight (ml)</span>
+        <span>%</span>
+      </div>
+    </div>
+    <div class="input-container">
+      <div>
+        <label for="hydrationWeightInput">Hydration:</label>
+        <input type="number" id="hydrationWeightInput" class="value-input" readonly tabindex="-1">
+        <input type="number" id="hydrationPercentageInput" value="65" class="percentage-input">
+      </div>
+    </div>
+  </div>
+
+  <div class="toggle-container">
+    <span class="switch-placeholder"></span>
+    <em class="theme-label">Summary</em>
+  </div>
+
+  <div id="summary-section">
+    <div class="input-container">
+      <div>
+        <label for="totalFlourInput">Total Flour:</label>
+        <input type="number" id="totalFlourInput" value="0" class="value-input" readonly tabindex="-1">
+        <input type="text" id="totalFlourPercentage" class="percentage-input" readonly tabindex="-1">
+      </div>
+    </div>
+    <div class="input-container">
+      <div>
+        <label for="totalDoughWeight">Total Weight:</label>
+        <input type="number" id="totalDoughWeight" class="value-input" readonly tabindex="-1">
+      </div>
+    </div>
+  </div>
+
+  <div class="toggle-container">
+    <label class="theme-switch" for="recipeDataCheckbox">
+      <input type="checkbox" id="recipeDataCheckbox">
+      <div class="slider round"></div>
+    </label>
+    <em class="theme-label">Recipe Data</em>
+  </div>
+
+  <div id="recipe-data-section" style="display: none;">
+    <textarea id="recipeJsonOutput" tabindex="-1"></textarea>
+    <button id="loadRecipeButton" class="load-btn">Load from Text</button>
+    <button id="saveRecipeButton" class="load-btn">Save Recipe</button>
+    <ul id="saved-recipes-list"></ul>
+  </div>
+
+
+  <div class="theme-switch-wrapper">
+    <label class="theme-switch" for="themeCheckbox">
+      <input type="checkbox" id="themeCheckbox" checked>
+      <div class="slider round"></div>
+    </label>
+    <em class="theme-label">Dark</em>
+  </div>
+
+</body>
+
+</html>
