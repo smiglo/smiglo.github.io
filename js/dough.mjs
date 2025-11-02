@@ -17,11 +17,7 @@ let dough = {
   flour: 0,
   totalFlour: 0,
   salt: 0,
-  seeds: 0,
-  gluten: 0,
-  malt: 0,
-  molasses: 0,
-  oil: 0,
+  otherIngredients: [],
   hydrationPercent: 65,
 };
 
@@ -45,16 +41,6 @@ if (!IN_CLI) {
     const sourdoughPercentage = document.getElementById('sourdoughPercentage');
     const saltInput = document.getElementById('saltInput');
     const saltPercentage = document.getElementById('saltPercentage');
-    const seedsInput = document.getElementById('seedsInput');
-    const seedsPercentage = document.getElementById('seedsPercentage');
-    const glutenInput = document.getElementById('glutenInput');
-    const glutenPercentage = document.getElementById('glutenPercentage');
-    const maltInput = document.getElementById('maltInput');
-    const maltPercentage = document.getElementById('maltPercentage');
-    const molassesInput = document.getElementById('molassesInput');
-    const molassesPercentage = document.getElementById('molassesPercentage');
-    const oilInput = document.getElementById('oilInput');
-    const oilPercentage = document.getElementById('oilPercentage');
     const prefermentTotalWeight = document.getElementById('prefermentTotalWeight');
     const prefermentPercentage = document.getElementById('prefermentPercentage');
     const hydrationWeightInput = document.getElementById('hydrationWeightInput');
@@ -65,6 +51,8 @@ if (!IN_CLI) {
     const recipeDataCheckbox = document.getElementById('recipeDataCheckbox');
     const recipeDataSection = document.getElementById('recipe-data-section');
     const loadRecipeButton = document.getElementById('loadRecipeButton');
+    const otherIngredientsContainer = document.getElementById('other-ingredients-container');
+    const addOtherIngredientWrapper = document.getElementById('add-other-ingredient-wrapper');
     const saveRecipeButton = document.getElementById('saveRecipeButton');
     const savedRecipesList = document.getElementById('saved-recipes-list');
     const STORAGE_KEY = 'dough-recipes';
@@ -73,7 +61,12 @@ if (!IN_CLI) {
       let totalFlour = 0;
 
       totalFlour += dough.flour;
-      totalFlour += dough.gluten;
+
+      dough.otherIngredients.forEach(ing => {
+        if (ing.name.toLowerCase() === 'gluten') {
+          totalFlour += ing.weight;
+        }
+      });
 
       if (sourdough.enabled) {
         const feedingsFlour = sourdough.flour.reduce((sum, current) => sum + current, 0);
@@ -95,17 +88,11 @@ if (!IN_CLI) {
       saltInput.value = Math.round(dough.salt);
       saltPercentage.value = totalFlour > 0 ? '2%' : '0%';
 
-      const seedsPerc = totalFlour > 0 ? (dough.seeds / totalFlour) * 100 : 0;
-      seedsPercentage.value = `${Math.round(seedsPerc)}%`;
-      const glutenPerc = totalFlour > 0 ? (dough.gluten / totalFlour) * 100 : 0;
-      glutenPercentage.value = `${Math.round(glutenPerc)}%`;
-      const maltPerc = totalFlour > 0 ? (dough.malt / totalFlour) * 100 : 0;
-      maltPercentage.value = `${Math.round(maltPerc)}%`;
-      const molassesPerc = totalFlour > 0 ? (dough.molasses / totalFlour) * 100 : 0;
-      molassesPercentage.value = `${Math.round(molassesPerc)}%`;
-      const oilPerc = totalFlour > 0 ? (dough.oil / totalFlour) * 100 : 0;
-      oilPercentage.value = `${Math.round(oilPerc)}%`;
-
+      document.querySelectorAll('.other-ingredient-percentage-input').forEach((input, index) => {
+        const weight = dough.otherIngredients[index]?.weight || 0;
+        const perc = totalFlour > 0 ? (weight / totalFlour) * 100 : 0;
+        input.value = `${Math.round(perc)}%`;
+      });
       if (sourdough.enabled) {
         const feedingsFlour = sourdough.flour.reduce((sum, current) => sum + current, 0);
         const feedingsWater = sourdough.water.reduce((sum, current) => sum + current, 0);
@@ -131,7 +118,11 @@ if (!IN_CLI) {
       if (preferment.enabled) {
         existingWater += preferment.water;
       }
-      existingWater += dough.molasses * 0.2;
+      dough.otherIngredients.forEach(ing => {
+        if (ing.name.toLowerCase() === 'molasses') {
+          existingWater += ing.weight * 0.2;
+        }
+      });
 
       if (totalFlour > 0) {
         const totalWaterNeeded = totalFlour * (dough.hydrationPercent / 100);
@@ -142,7 +133,18 @@ if (!IN_CLI) {
       }
 
       const totalWater = totalFlour * (dough.hydrationPercent / 100);
-      const finalWeight = totalFlour + totalWater + dough.salt + dough.seeds + dough.malt + dough.molasses + dough.oil;
+      const otherIngredientsWeight = dough.otherIngredients.reduce((sum, ing) => {
+        const name = ing.name.toLowerCase();
+        if (name === 'gluten') {
+          return sum;
+        }
+        if (name === 'molasses') {
+          return sum + (ing.weight * 0.8);
+        }
+        return sum + ing.weight;
+      }, 0);
+
+      const finalWeight = totalFlour + totalWater + dough.salt + otherIngredientsWeight;
       totalDoughWeight.value = Math.round(finalWeight);
 
       const doughForJson = { ...dough };
@@ -278,11 +280,6 @@ if (!IN_CLI) {
         prefermentFlourInput.value = preferment.flour;
         prefermentWaterInput.value = preferment.water;
         doughFlourInput.value = dough.flour;
-        seedsInput.value = dough.seeds;
-        glutenInput.value = dough.gluten;
-        maltInput.value = dough.malt;
-        molassesInput.value = dough.molasses;
-        oilInput.value = dough.oil;
         hydrationPercentageInput.value = dough.hydrationPercent;
 
         rebuildSourdoughUI();
@@ -306,13 +303,70 @@ if (!IN_CLI) {
 
     const updateDoughTotals = () => {
       dough.flour = Number(doughFlourInput.value) || 0;
-      dough.seeds = Number(seedsInput.value) || 0;
-      dough.gluten = Number(glutenInput.value) || 0;
-      dough.malt = Number(maltInput.value) || 0;
-      dough.molasses = Number(molassesInput.value) || 0;
-      dough.oil = Number(oilInput.value) || 0;
       dough.hydrationPercent = Number(hydrationPercentageInput.value) || 0;
       recalculateAllTotals();
+    };
+
+    const addOtherIngredientRow = (ingredient = { name: '', weight: 0 }, isInitial = false) => {
+      const rowIndex = dough.otherIngredients.length;
+      if (isInitial) {
+        dough.otherIngredients.push(ingredient);
+      }
+
+      const newRow = document.createElement('div');
+      newRow.classList.add('input-container');
+      const innerDiv = document.createElement('div');
+
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.placeholder = 'Ingredient Name';
+      nameInput.value = ingredient.name;
+      nameInput.classList.add('other-ingredient-name-input');
+
+      const weightInput = document.createElement('input');
+      weightInput.type = 'number';
+      weightInput.value = ingredient.weight;
+      weightInput.classList.add('value-input');
+
+      const percentageInput = document.createElement('input');
+      percentageInput.type = 'text';
+      percentageInput.readOnly = true;
+      percentageInput.tabIndex = -1;
+      percentageInput.classList.add('percentage-input', 'other-ingredient-percentage-input');
+
+      nameInput.addEventListener('input', () => {
+        dough.otherIngredients[rowIndex].name = nameInput.value;
+        recalculateAllTotals();
+      });
+      weightInput.addEventListener('input', () => {
+        dough.otherIngredients[rowIndex].weight = Number(weightInput.value) || 0;
+        recalculateAllTotals();
+      });
+
+      innerDiv.append(nameInput, weightInput, percentageInput);
+      newRow.appendChild(innerDiv);
+      otherIngredientsContainer.appendChild(newRow);
+    };
+
+    const createAddOtherButton = () => {
+      addOtherIngredientWrapper.innerHTML = '';
+      const addButton = document.createElement('button');
+      addButton.textContent = '+';
+      addButton.classList.add('add-row-btn');
+      addButton.addEventListener('click', () => {
+        addOtherIngredientRow({ name: '', weight: 0 }, true);
+        createAddOtherButton();
+      }, { once: true });
+      addOtherIngredientWrapper.appendChild(addButton);
+    };
+
+    const rebuildOtherIngredientsUI = () => {
+      otherIngredientsContainer.innerHTML = '';
+      addOtherIngredientWrapper.innerHTML = '';
+      dough.otherIngredients.forEach(ingredient => {
+        addOtherIngredientRow(ingredient, false);
+      });
+      createAddOtherButton();
     };
 
     const updatePrefermentHeaderVisibility = () => {
@@ -433,11 +487,6 @@ if (!IN_CLI) {
     });
 
     doughFlourInput.addEventListener('input', updateDoughTotals);
-    seedsInput.addEventListener('input', updateDoughTotals);
-    glutenInput.addEventListener('input', updateDoughTotals);
-    maltInput.addEventListener('input', updateDoughTotals);
-    molassesInput.addEventListener('input', updateDoughTotals);
-    oilInput.addEventListener('input', updateDoughTotals);
     recipeNameInput.addEventListener('input', () => {
       recipeName = recipeNameInput.value;
       recalculateAllTotals();
@@ -460,6 +509,7 @@ if (!IN_CLI) {
     updateSourdoughTotals();
     updatePrefermentTotals();
     updateDoughTotals();
+    rebuildOtherIngredientsUI();
     renderRecipeList();
     recalculateAllTotals();
   });

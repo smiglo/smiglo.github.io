@@ -65,6 +65,12 @@
   width: 214px !important;
 }
 
+.other-ingredient-name-input {
+  width: 125px !important;
+  margin-right: 10px;
+  text-align: left !important;
+}
+
 .name-container {
   margin-bottom: 25px !important;
 }
