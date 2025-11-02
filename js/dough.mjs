@@ -492,6 +492,19 @@ if (!IN_CLI) {
       recalculateAllTotals();
     });
 
+    recipeJsonOutput.addEventListener('click', () => {
+      navigator.clipboard.writeText(recipeJsonOutput.value)
+        .then(() => {
+          recipeJsonOutput.classList.add('copied');
+          setTimeout(() => {
+            recipeJsonOutput.classList.remove('copied');
+          }, 350);
+        })
+        .catch(err => {
+          console.error('Failed to copy JSON to clipboard:', err);
+        });
+    });
+
     hydrationPercentageInput.addEventListener('input', updateDoughTotals);
 
     loadRecipeButton.addEventListener('click', loadRecipeFromJson);
