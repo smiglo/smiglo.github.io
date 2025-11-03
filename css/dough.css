@@ -1,0 +1,140 @@
+#sourdough-section {
+  margin-bottom: 10px;
+}
+
+#preferment-section {
+  margin-bottom: 10px;
+}
+
+#dough-section {
+  margin-bottom: 25px;
+}
+
+#hydration-section {
+  margin-bottom: 25px;
+}
+
+#summary-section {
+  margin-bottom: 25px;
+}
+
+.add-row-btn {
+  width: 125px;
+  margin-right: 10px;
+  text-align: left !important;
+}
+
+#sourdough-section input,
+#preferment-section input,
+#dough-section input,
+#hydration-section input,
+#summary-section input {
+  text-align: right;
+}
+
+.dough-header span {
+  display: inline-block;
+  font-weight: bold;
+  text-align: center;
+}
+
+.dough-header span:nth-of-type(1) {
+  width: 150px;
+}
+
+.dough-header span:nth-of-type(2) {
+  width: 60px;
+}
+
+.value-input {
+  width: 150px !important;
+}
+
+.percentage-input {
+  width: 60px !important;
+  margin-left: 4px;
+}
+
+.full-width-input {
+  width: 214px !important;
+}
+
+.other-ingredient-name-input {
+  width: 125px !important;
+  margin-right: 10px;
+  text-align: left !important;
+}
+
+.name-container {
+  margin-bottom: 25px !important;
+}
+
+.half-value-input-1 {
+  width: 73px !important;
+}
+.half-value-input-2 {
+  width: 73px !important;
+  margin-left: 4px;
+}
+
+#sourdough-section input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#recipe-data-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 25px;
+}
+
+#recipe-data-section textarea {
+  width: 100%;
+  min-height: 200px;
+  font-family: "Fira Mono", monospace;
+  font-size: 12px;
+  resize: vertical;
+  margin-bottom: 8px;
+}
+
+.load-btn {
+  height: 24px;
+  align-self: flex-start;
+}
+
+#saved-recipes-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+#saved-recipes-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-bottom: 1px solid #555;
+}
+
+#saved-recipes-list li:first-child {
+  border-top: 1px solid #555;
+}
+
+#saved-recipes-list .recipe-info {
+  cursor: pointer;
+}
+
+#saved-recipes-list .recipe-date {
+  font-size: 12px;
+  color: #888;
+  margin-left: 15px;
+}
+
+#saved-recipes-list .remove-btn {
+  background-color: #f92672;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px 8px;
+}

@@ -1,3 +1,7 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 .fira-mono-regular {
   font-family: "Fira Mono", monospace;
   font-weight: 400;
@@ -40,6 +44,7 @@
   align-items: center;
   margin-top: 10px;
   margin-bottom: 0;
+  gap: 10px;
 }
 
 .theme-switch {
@@ -50,7 +55,10 @@
 }
 
 .theme-switch input {
-  display: none;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
 }
 
 .slider {
@@ -73,6 +81,11 @@
   position: absolute;
   transition: 0.4s;
   width: 16px;
+}
+
+input:focus-visible + .slider {
+  outline: 2px solid #2196F3;
+  outline-offset: 2px;
 }
 
 input:checked + .slider {
@@ -102,6 +115,7 @@ input {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-bottom: 4px;
 }
 
 .input-container div {
@@ -142,7 +156,18 @@ input {
 }
 
 .theme-label {
-  margin-left: 5px;
+  font-style: normal;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.toggle-container .theme-label {
+  width: 125px;
 }
 
 ol {
