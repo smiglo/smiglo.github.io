@@ -170,6 +170,27 @@
   </div>
 
   <div class="toggle-container">
+    <em class="theme-label">Sync Settings</em>
+    <label class="theme-switch" for="syncSettingsCheckbox">
+      <input type="checkbox" id="syncSettingsCheckbox">
+      <div class="slider round"></div>
+    </label>
+  </div>
+
+  <div id="sync-settings-section" style="display: none;">
+    <div class="input-container">
+      <label for="jsonbinAccessKey">jsonbin.io Access Key:</label>
+      <input type="password" id="jsonbinAccessKey" class="full-width-input">
+    </div>
+    <div class="input-container">
+      <label for="jsonbinBinId">jsonbin.io Bin ID:</label>
+      <input type="text" id="jsonbinBinId" class="full-width-input">
+    </div>
+    <button id="saveSyncSettingsButton" class="load-btn">Save Sync Settings</button>
+    <span id="syncStatus"></span>
+  </div>
+
+  <div class="toggle-container">
     <em class="theme-label">Recipe Data</em>
     <label class="theme-switch" for="recipeDataCheckbox">
       <input type="checkbox" id="recipeDataCheckbox">
@@ -183,7 +204,6 @@
     <textarea id="recipeJsonOutput" tabindex="-1"></textarea>
     <button id="loadRecipeButton" class="load-btn">Load from Text</button>
   </div>
-
 
   <div class="toggle-container">
     <em class="theme-label">Dark</em>

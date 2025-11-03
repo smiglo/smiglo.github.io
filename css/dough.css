@@ -18,6 +18,10 @@
   margin-bottom: 25px;
 }
 
+#sync-settings-section {
+  margin-bottom: 25px;
+}
+
 .add-row-btn {
   width: 125px;
   margin-right: 10px;
@@ -137,4 +141,9 @@
   border-radius: 4px;
   cursor: pointer;
   padding: 4px 8px;
+}
+
+#syncStatus {
+  margin-left: 10px;
+  font-size: 14px;
 }

@@ -56,6 +56,13 @@ if (!IN_CLI) {
     const saveRecipeButton = document.getElementById('saveRecipeButton');
     const savedRecipesList = document.getElementById('saved-recipes-list');
     const STORAGE_KEY = 'dough-recipes';
+    const SYNC_SETTINGS_KEY = 'dough-sync-settings';
+    const syncSettingsCheckbox = document.getElementById('syncSettingsCheckbox');
+    const syncSettingsSection = document.getElementById('sync-settings-section');
+    const jsonbinAccessKeyInput = document.getElementById('jsonbinAccessKey');
+    const jsonbinBinIdInput = document.getElementById('jsonbinBinId');
+    const saveSyncSettingsButton = document.getElementById('saveSyncSettingsButton');
+    const syncStatus = document.getElementById('syncStatus');
 
     const recalculateAllTotals = () => {
       let totalFlour = 0;
@@ -165,8 +172,66 @@ if (!IN_CLI) {
       return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     };
 
-    const saveRecipes = (recipes) => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+    const saveRecipes = async (recipes) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes.recipes));
+      await updateRecipesInBin();
+    };
+
+    const getSyncSettings = () => {
+      return JSON.parse(localStorage.getItem(SYNC_SETTINGS_KEY) || '{}');
+    };
+
+    const saveSyncSettings = () => {
+      const settings = {
+        accessKey: jsonbinAccessKeyInput.value,
+        binId: jsonbinBinIdInput.value,
+      };
+      localStorage.setItem(SYNC_SETTINGS_KEY, JSON.stringify(settings));
+      alert('Sync settings saved!');
+      fetchRecipesFromBin();
+    };
+
+    const fetchRecipesFromBin = async () => {
+      const { accessKey, binId } = getSyncSettings();
+      if (!accessKey || !binId) return;
+      try {
+        syncStatus.textContent = 'Syncing...';
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+          method: 'GET',
+          headers: { 'X-Access-Key': accessKey },
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        if (data && data.record) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data?.record?.recipes));
+        }
+        renderRecipeList();
+        syncStatus.textContent = `Synced at ${new Date().toLocaleTimeString()}`;
+      } catch (error) {
+        console.error('Failed to fetch recipes from jsonbin.io:', error);
+        syncStatus.textContent = 'Sync failed.';
+      }
+    };
+
+    const updateRecipesInBin = async () => {
+      const { accessKey, binId } = getSyncSettings();
+      if (!accessKey || !binId) return;
+      try {
+        syncStatus.textContent = 'Saving...';
+        const recipes = getSavedRecipes();
+        await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Access-Key': accessKey,
+          },
+          body: JSON.stringify({ recipes: recipes }), // Wrap recipes in an object
+        });
+        syncStatus.textContent = `Saved at ${new Date().toLocaleTimeString()}`;
+      } catch (error) {
+        console.error('Failed to update recipes in jsonbin.io:', error);
+        syncStatus.textContent = 'Save failed.';
+      }
     };
 
     const renderRecipeList = () => {
@@ -182,13 +247,16 @@ if (!IN_CLI) {
         `;
         infoDiv.addEventListener('click', () => loadRecipe(recipe.name));
 
+        const buttonContainer = document.createElement('div');
+
         const removeBtn = document.createElement('button');
         removeBtn.textContent = 'Remove';
         removeBtn.classList.add('remove-btn');
         removeBtn.addEventListener('click', () => removeRecipe(recipe.name));
 
         li.appendChild(infoDiv);
-        li.appendChild(removeBtn);
+        buttonContainer.appendChild(removeBtn);
+        li.appendChild(buttonContainer);
         savedRecipesList.appendChild(li);
       });
     };
@@ -523,11 +591,23 @@ if (!IN_CLI) {
       document.body.classList.toggle('light-mode');
     });
 
+    syncSettingsCheckbox.addEventListener('change', () => {
+      syncSettingsSection.style.display = syncSettingsCheckbox.checked ? 'block' : 'none';
+    });
+
+    saveSyncSettingsButton.addEventListener('click', saveSyncSettings);
+
+    const { accessKey, binId } = getSyncSettings();
+    jsonbinAccessKeyInput.value = accessKey || '';
+    jsonbinBinIdInput.value = binId || '';
+    fetchRecipesFromBin();
+
     updateSourdoughTotals();
     updatePrefermentTotals();
     updateDoughTotals();
     rebuildOtherIngredientsUI();
     renderRecipeList();
+
     recalculateAllTotals();
   });
 } else {
