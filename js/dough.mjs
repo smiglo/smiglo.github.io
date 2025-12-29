@@ -172,6 +172,7 @@ if (!IN_CLI) {
 
     const renderRecipeList = () => {
       const recipes = getSavedRecipes();
+      recipes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
       savedRecipesList.innerHTML = '';
       recipes.forEach(recipe => {
         const li = document.createElement('li');
