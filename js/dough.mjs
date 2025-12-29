@@ -54,6 +54,7 @@ if (!IN_CLI) {
     const otherIngredientsContainer = document.getElementById('other-ingredients-container');
     const addOtherIngredientWrapper = document.getElementById('add-other-ingredient-wrapper');
     const saveRecipeButton = document.getElementById('saveRecipeButton');
+    const clearRecipeButton = document.getElementById('clearRecipeButton');
     const savedRecipesList = document.getElementById('saved-recipes-list');
     const STORAGE_KEY = 'dough-recipes';
 
@@ -262,6 +263,43 @@ if (!IN_CLI) {
       innerDiv.append(addButton, flourInput, waterInput);
       newRow.appendChild(innerDiv);
       sourdoughAdditionsBody.appendChild(newRow);
+    };
+
+    const resetRecipe = () => {
+      recipeName = '';
+      sourdough = {
+        enabled: false,
+        initial: 0,
+        flour: [],
+        water: [],
+      };
+      preferment = {
+        enabled: false,
+        flour: 0,
+        water: 0,
+      };
+      dough = {
+        flour: 0,
+        totalFlour: 0,
+        salt: 0,
+        otherIngredients: [],
+        hydrationPercent: 65,
+      };
+
+      recipeNameInput.value = '';
+      sourdoughCheckbox.checked = false;
+      initialAmountInput.value = 0;
+      prefermentCheckbox.checked = false;
+      prefermentFlourInput.value = 0;
+      prefermentWaterInput.value = 0;
+      doughFlourInput.value = 0;
+      hydrationPercentageInput.value = 65;
+
+      rebuildSourdoughUI();
+      prefermentSection.style.display = 'none';
+      updatePrefermentHeaderVisibility();
+      rebuildOtherIngredientsUI();
+      recalculateAllTotals();
     };
 
     const loadRecipeFromJson = () => {
@@ -513,6 +551,9 @@ if (!IN_CLI) {
 
     loadRecipeButton.addEventListener('click', loadRecipeFromJson);
     saveRecipeButton.addEventListener('click', saveRecipe);
+    if (clearRecipeButton) {
+      clearRecipeButton.addEventListener('click', resetRecipe);
+    }
 
     recipeDataCheckbox.addEventListener('change', () => {
       recipeDataSection.style.display = recipeDataCheckbox.checked ? 'block' : 'none';
