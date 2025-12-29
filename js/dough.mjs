@@ -529,6 +529,17 @@ if (!IN_CLI) {
     rebuildOtherIngredientsUI();
     renderRecipeList();
     recalculateAllTotals();
+
+    const savedRecipes = getSavedRecipes();
+    if (savedRecipes.length > 0) {
+      const lastRecipe = savedRecipes.reduce((prev, current) =>
+        new Date(prev.timestamp) > new Date(current.timestamp) ? prev : current
+      );
+      recipeJsonOutput.value = JSON.stringify(lastRecipe, null, 2);
+      loadRecipeFromJson();
+      recipeDataCheckbox.checked = true;
+      recipeDataSection.style.display = 'block';
+    }
   });
 } else {
   console.log("Welcome in cli");
