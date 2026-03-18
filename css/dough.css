@@ -55,6 +55,11 @@
   margin-left: 4px;
 }
 
+.ingredient-radio {
+  width: 10px;
+  margin-left: 10px
+}
+
 .full-width-input {
   width: 214px !important;
 }

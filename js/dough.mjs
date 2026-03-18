@@ -64,7 +64,7 @@ if (!IN_CLI) {
       totalFlour += dough.flour;
 
       dough.otherIngredients.forEach(ing => {
-        if (ing.name.toLowerCase() === 'gluten') {
+        if (ing.type === 'flour') {
           totalFlour += ing.weight;
         }
       });
@@ -120,8 +120,8 @@ if (!IN_CLI) {
         existingWater += preferment.water;
       }
       dough.otherIngredients.forEach(ing => {
-        if (ing.name.toLowerCase() === 'molasses') {
-          existingWater += ing.weight * 0.2;
+        if (ing.type === 'water') {
+          existingWater += ing.weight;
         }
       });
 
@@ -135,12 +135,8 @@ if (!IN_CLI) {
 
       const totalWater = totalFlour * (dough.hydrationPercent / 100);
       const otherIngredientsWeight = dough.otherIngredients.reduce((sum, ing) => {
-        const name = ing.name.toLowerCase();
-        if (name === 'gluten') {
+        if (ing.type === 'flour' || ing.type === 'water') {
           return sum;
-        }
-        if (name === 'molasses') {
-          return sum + (ing.weight * 0.8);
         }
         return sum + ing.weight;
       }, 0);
@@ -312,6 +308,18 @@ if (!IN_CLI) {
         Object.assign(preferment, data.preferment);
         Object.assign(dough, data.dough);
 
+        if (dough.otherIngredients) {
+          dough.otherIngredients.forEach(ing => {
+            if (!ing.type) {
+              if (ing.name && ing.name.toLowerCase() === 'gluten') {
+                ing.type = 'flour';
+              } else {
+                ing.type = 'other';
+              }
+            }
+          });
+        }
+
         recipeNameInput.value = recipeName;
         sourdoughCheckbox.checked = sourdough.enabled;
         initialAmountInput.value = sourdough.initial;
@@ -350,8 +358,8 @@ if (!IN_CLI) {
       recalculateAllTotals();
     };
 
-    const addOtherIngredientRow = (ingredient = { name: '', weight: 0 }, isInitial = false) => {
-      const rowIndex = dough.otherIngredients.length;
+    const addOtherIngredientRow = (ingredient = { name: '', weight: 0, type: 'other' }, isInitial = false, index = null) => {
+      const rowIndex = isInitial ? dough.otherIngredients.length : index;
       if (isInitial) {
         dough.otherIngredients.push(ingredient);
       }
@@ -377,6 +385,40 @@ if (!IN_CLI) {
       percentageInput.tabIndex = -1;
       percentageInput.classList.add('percentage-input', 'other-ingredient-percentage-input');
 
+      const radioGroup = 'ing-type-' + Math.random().toString(36).substr(2, 9);
+
+      const flourRadio = document.createElement('input');
+      flourRadio.type = 'radio';
+      flourRadio.name = radioGroup;
+      flourRadio.checked = ingredient.type === 'flour';
+      flourRadio.className = "ingredient-radio";
+
+      const waterRadio = document.createElement('input');
+      waterRadio.type = 'radio';
+      waterRadio.name = radioGroup;
+      waterRadio.checked = ingredient.type === 'water';
+      waterRadio.className = "ingredient-radio";
+
+      flourRadio.addEventListener('click', () => {
+        if (dough.otherIngredients[rowIndex].type === 'flour') {
+          flourRadio.checked = false;
+          dough.otherIngredients[rowIndex].type = 'other';
+        } else {
+          dough.otherIngredients[rowIndex].type = 'flour';
+        }
+        recalculateAllTotals();
+      });
+
+      waterRadio.addEventListener('click', () => {
+        if (dough.otherIngredients[rowIndex].type === 'water') {
+          waterRadio.checked = false;
+          dough.otherIngredients[rowIndex].type = 'other';
+        } else {
+          dough.otherIngredients[rowIndex].type = 'water';
+        }
+        recalculateAllTotals();
+      });
+
       nameInput.addEventListener('input', () => {
         dough.otherIngredients[rowIndex].name = nameInput.value;
         recalculateAllTotals();
@@ -386,7 +428,7 @@ if (!IN_CLI) {
         recalculateAllTotals();
       });
 
-      innerDiv.append(nameInput, weightInput, percentageInput);
+      innerDiv.append(nameInput, weightInput, percentageInput, flourRadio, waterRadio);
       newRow.appendChild(innerDiv);
       otherIngredientsContainer.appendChild(newRow);
     };
@@ -397,7 +439,7 @@ if (!IN_CLI) {
       addButton.textContent = '+';
       addButton.classList.add('add-row-btn');
       addButton.addEventListener('click', () => {
-        addOtherIngredientRow({ name: '', weight: 0 }, true);
+        addOtherIngredientRow({ name: '', weight: 0, type: 'other' }, true);
         createAddOtherButton();
       }, { once: true });
       addOtherIngredientWrapper.appendChild(addButton);
@@ -406,8 +448,8 @@ if (!IN_CLI) {
     const rebuildOtherIngredientsUI = () => {
       otherIngredientsContainer.innerHTML = '';
       addOtherIngredientWrapper.innerHTML = '';
-      dough.otherIngredients.forEach(ingredient => {
-        addOtherIngredientRow(ingredient, false);
+      dough.otherIngredients.forEach((ingredient, index) => {
+        addOtherIngredientRow(ingredient, false, index);
       });
       createAddOtherButton();
     };
