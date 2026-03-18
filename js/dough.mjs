@@ -24,6 +24,12 @@ let dough = {
 if (!IN_CLI) {
   let recipeName = '';
   document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('focusin', (e) => {
+      if (e.target.tagName === 'INPUT' && (e.target.type === 'text' || e.target.type === 'number') && !e.target.readOnly) {
+        setTimeout(() => e.target.select(), 50);
+      }
+    });
+
     const sourdoughCheckbox = document.getElementById('sourdoughCheckbox');
     const sourdoughSection = document.getElementById('sourdough-section');
     const sourdoughAdditionsBody = document.getElementById('sourdough-additions');
