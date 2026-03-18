@@ -248,11 +248,13 @@ if (!IN_CLI) {
       flourInput.type = 'number';
       flourInput.value = flourValue;
       flourInput.classList.add('half-value-input-1');
+      flourInput.inputMode = 'decimal';
 
       const waterInput = document.createElement('input');
       waterInput.type = 'number';
       waterInput.value = waterValue;
       waterInput.classList.add('half-value-input-2');
+      waterInput.inputMode = 'decimal';
 
       flourInput.addEventListener('input', () => {
         sourdough.flour[rowIndex] = Number(flourInput.value) || 0;
@@ -384,6 +386,7 @@ if (!IN_CLI) {
       weightInput.type = 'number';
       weightInput.value = ingredient.weight;
       weightInput.classList.add('value-input');
+      weightInput.inputMode = 'decimal';
 
       const percentageInput = document.createElement('input');
       percentageInput.type = 'text';
@@ -490,11 +493,13 @@ if (!IN_CLI) {
       flourInput.type = 'number';
       flourInput.disabled = true;
       flourInput.classList.add('half-value-input-1');
+      flourInput.inputMode = 'decimal';
 
       const waterInput = document.createElement('input');
       waterInput.type = 'number';
       waterInput.disabled = true;
       waterInput.classList.add('half-value-input-2');
+      waterInput.inputMode = 'decimal';
 
       let waterManuallySet = false;
       let flourManuallySet = false;
