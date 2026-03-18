@@ -45,7 +45,7 @@
     <div class="input-container">
       <div>
         <label for="initialAmountInput">Initial:</label>
-        <input type="number" id="initialAmountInput" value="0" class="value-input">
+        <input type="number" id="initialAmountInput" value="0" class="value-input" inputmode="decimal">
       </div>
     </div>
 
@@ -85,8 +85,8 @@
     <div class="input-container">
       <div>
         <label></label>
-        <input type="number" id="prefermentFlourInput" class="half-value-input-1">
-        <input type="number" id="prefermentWaterInput" class="half-value-input-2">
+        <input type="number" id="prefermentFlourInput" class="half-value-input-1" inputmode="decimal">
+        <input type="number" id="prefermentWaterInput" class="half-value-input-2" inputmode="decimal">
       </div>
     </div>
     <div class="input-container">
@@ -108,13 +108,17 @@
         <label></label>
         <span>Weight</span>
         <span>%</span>
+        <span class="ingredient-radio">Fl</span>
+        <span class="ingredient-radio" style="margin-left: 15px;">Wa</span>
       </div>
     </div>
     <div class="input-container">
       <div>
         <label for="doughFlourInput">Add. flour:</label>
-        <input type="number" id="doughFlourInput" value="0" class="value-input">
+        <input type="number" id="doughFlourInput" value="0" class="value-input" inputmode="decimal">
         <input type="text" id="doughFlourPercentage" class="percentage-input" readonly tabindex="-1">
+        <input type="radio" class="ingredient-radio" checked disabled hidden>
+        <input type="radio" class="ingredient-radio" disabled hidden>
       </div>
     </div>
     <div class="input-container">
@@ -122,6 +126,8 @@
         <label for="saltInput">Salt:</label>
         <input type="number" id="saltInput" value="0" class="value-input" readonly tabindex="-1">
         <input type="text" id="saltPercentage" class="percentage-input" readonly tabindex="-1">
+        <input type="radio" class="ingredient-radio" disabled hidden>
+        <input type="radio" class="ingredient-radio" disabled hidden>
       </div>
     </div>
     <div id="other-ingredients-container"></div>
@@ -130,21 +136,16 @@
 
   <div class="toggle-container">
     <em class="theme-label">Hydration</em>
+    <input type="number" id="hydrationPercentageInput" value="65" class="percentage-input" style="text-align: right; width: 150px !important; margin-left: 0px;" inputmode="decimal"><label>%</label>
   </div>
 
   <div id="hydration-section">
-    <div class="input-container dough-header">
-      <div>
-        <label></label>
-        <span>Weight (ml)</span>
-        <span>%</span>
-      </div>
-    </div>
     <div class="input-container">
       <div>
         <label for="hydrationWeightInput">Add. water:</label>
         <input type="number" id="hydrationWeightInput" class="value-input" readonly tabindex="-1">
-        <input type="number" id="hydrationPercentageInput" value="65" class="percentage-input">
+        <input type="radio" class="ingredient-radio" disabled hidden>
+        <input type="radio" class="ingredient-radio" checked disabled hidden>
       </div>
     </div>
   </div>
@@ -169,6 +170,12 @@
     </div>
   </div>
 
+  <div id="recipe-storage" style="display: block;">
+    <button id="saveRecipeButton" class="load-btn">Save</button>
+    <button id="clearRecipeButton" class="load-btn">Clear</button>
+    <ul id="saved-recipes-list"></ul>
+  </div>
+
   <div class="toggle-container">
     <em class="theme-label">Recipe Data</em>
     <label class="theme-switch" for="recipeDataCheckbox">
@@ -178,9 +185,6 @@
   </div>
 
   <div id="recipe-data-section" style="display: none;">
-    <button id="saveRecipeButton" class="load-btn">Save Recipe</button>
-    <button id="clearRecipeButton" class="load-btn">Clear Recipe</button>
-    <ul id="saved-recipes-list"></ul>
     <textarea id="recipeJsonOutput" tabindex="-1"></textarea>
     <button id="loadRecipeButton" class="load-btn">Load from Text</button>
   </div>
