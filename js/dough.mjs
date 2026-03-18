@@ -630,7 +630,5 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     recipeJsonOutput.value = JSON.stringify(lastRecipe, null, 2);
     loadRecipeFromJson();
-    recipeDataCheckbox.checked = true;
-    recipeDataSection.style.display = 'block';
   }
 });

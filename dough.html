@@ -170,6 +170,12 @@
     </div>
   </div>
 
+  <div id="recipe-storage" style="display: block;">
+    <button id="saveRecipeButton" class="load-btn">Save</button>
+    <button id="clearRecipeButton" class="load-btn">Clear</button>
+    <ul id="saved-recipes-list"></ul>
+  </div>
+
   <div class="toggle-container">
     <em class="theme-label">Recipe Data</em>
     <label class="theme-switch" for="recipeDataCheckbox">
@@ -179,9 +185,6 @@
   </div>
 
   <div id="recipe-data-section" style="display: none;">
-    <button id="saveRecipeButton" class="load-btn">Save</button>
-    <button id="clearRecipeButton" class="load-btn">Clear</button>
-    <ul id="saved-recipes-list"></ul>
     <textarea id="recipeJsonOutput" tabindex="-1"></textarea>
     <button id="loadRecipeButton" class="load-btn">Load from Text</button>
   </div>
