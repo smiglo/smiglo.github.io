@@ -74,6 +74,25 @@
   margin-bottom: 25px !important;
 }
 
+.notes-container {
+  margin-bottom: 20px !important;
+}
+
+.notes-label {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.recipe-notes-input {
+  width: 214px !important;
+  min-height: 80px;
+  resize: vertical;
+  font-family: "Fira Mono", monospace;
+  font-size: 14px;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
 .half-value-input-1 {
   width: 73px !important;
 }
