@@ -20,6 +20,7 @@ let dough = {
 };
 
 let recipeName = '';
+let recipeNotes = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('focusin', (e) => {
@@ -51,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const hydrationPercentageInput = document.getElementById('hydrationPercentageInput');
   const totalDoughWeight = document.getElementById('totalDoughWeight');
   const recipeNameInput = document.getElementById('recipeNameInput');
+  const recipeNotesInput = document.getElementById('recipeNotesInput');
   const recipeJsonOutput = document.getElementById('recipeJsonOutput');
   const recipeDataCheckbox = document.getElementById('recipeDataCheckbox');
   const recipeDataSection = document.getElementById('recipe-data-section');
@@ -154,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const recipeData = {
       name: recipeName,
+      notes: recipeNotes,
       sourdough: sourdough,
       preferment: preferment,
       dough: doughForJson,
@@ -270,6 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const resetRecipe = () => {
     recipeName = '';
+    recipeNotes = '';
     sourdough = {
       enabled: false,
       initial: 0,
@@ -290,6 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     recipeNameInput.value = '';
+    recipeNotesInput.value = '';
     sourdoughCheckbox.checked = false;
     initialAmountInput.value = 0;
     prefermentCheckbox.checked = false;
@@ -310,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = JSON.parse(recipeJsonOutput.value);
 
       recipeName = data.name || '';
+      recipeNotes = data.notes || '';
       Object.assign(sourdough, data.sourdough);
       Object.assign(preferment, data.preferment);
       Object.assign(dough, data.dough);
@@ -327,6 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       recipeNameInput.value = recipeName;
+      recipeNotesInput.value = recipeNotes;
       sourdoughCheckbox.checked = sourdough.enabled;
       initialAmountInput.value = sourdough.initial;
       prefermentCheckbox.checked = preferment.enabled;
@@ -583,6 +590,10 @@ document.addEventListener('DOMContentLoaded', () => {
   doughFlourInput.addEventListener('input', updateDoughTotals);
   recipeNameInput.addEventListener('input', () => {
     recipeName = recipeNameInput.value;
+    recalculateAllTotals();
+  });
+  recipeNotesInput.addEventListener('input', () => {
+    recipeNotes = recipeNotesInput.value;
     recalculateAllTotals();
   });
 

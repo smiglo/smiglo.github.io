@@ -8,6 +8,7 @@ body.light-mode h1 {
 }
 
 body.light-mode input,
+body.light-mode textarea,
 body.light-mode button {
   background-color: #ffffff;
   color: #272822;

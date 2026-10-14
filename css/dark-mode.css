@@ -8,6 +8,7 @@ body.dark-mode h1 {
 }
 
 body.dark-mode input,
+body.dark-mode textarea,
 body.dark-mode button {
   background-color: #3e3d32;
   color: #f8f8f2;
